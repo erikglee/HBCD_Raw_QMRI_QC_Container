@@ -2,7 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import os, glob, shutil
+import os, glob, shutil, gzip
 import dipy
 import warnings
 import nibabel as nib
@@ -17,6 +17,25 @@ from dipy.align.imaffine import (AffineMap,
 from dipy.align.transforms import (TranslationTransform3D,
                                    RigidTransform3D)
 
+
+def replace_file_with_gzipped_version(file_path):
+    '''Replace a file with a gzipped version of itself
+    
+    Parameters
+    ----------
+    file_path : str
+        Path to the file to be gzipped
+    
+    '''
+    
+    #file_path = path to the file to be gzipped
+    
+    with open(file_path, 'rb') as f_in:
+        with gzip.open(file_path + '.gz', 'wb') as f_out:
+            f_out.writelines(f_in)
+    os.remove(file_path)
+    
+    return file_path + '.gz'
 
 def calc_synth_t1w_t2w(t1map_path, t2map_path, pdmap_path, output_folder, subject_name, session_name):
     
@@ -95,12 +114,12 @@ def register_images(input_file_path, output_file_path,
         
     if 'T1w' in input_file_path:
         contrast = 'T1w'
-        stripped_out_file = os.path.join(output_file_path).replace('T1w.nii.gz', 'masked-brain_T1w.nii.gz')
-        generic_out_mask = os.path.join(output_file_path).replace('T1w.nii.gz', 'masked-brain.nii.gz')
+        stripped_out_file = os.path.join(output_file_path).replace('T1w.nii', 'masked-brain_T1w.nii')
+        generic_out_mask = os.path.join(output_file_path).replace('T1w.nii', 'masked-brain.nii')
     elif 'T2w' in input_file_path:
         contrast = 'T2w'
-        stripped_out_file = os.path.join(output_file_path).replace('T2w.nii.gz', 'masked-brain_T2w.nii.gz')
-        generic_out_mask = os.path.join(output_file_path).replace('T2w.nii.gz', 'masked-brain.nii.gz')
+        stripped_out_file = os.path.join(output_file_path).replace('T2w.nii', 'masked-brain_T2w.nii')
+        generic_out_mask = os.path.join(output_file_path).replace('T2w.nii', 'masked-brain.nii')
         
     if os.path.exists(output_file_path):
         print('Using already existing registered out file with name: {}'.format(output_file_path))
@@ -127,7 +146,7 @@ def register_images(input_file_path, output_file_path,
     
     #(registered out path is the name of the skull stripped image that has
     #been registered)
-    registered_out_path = stripped_out_file.replace('{}.nii.gz'.format(contrast), 'reg-MNIInfant_{}.nii.gz'.format(contrast))
+    registered_out_path = stripped_out_file.replace('{}.nii'.format(contrast), 'reg-MNIInfant_{}.nii'.format(contrast))
     dipy.io.image.save_nifti(registered_out_path,
                          registered_img[0], template_image[1])
     
@@ -389,15 +408,17 @@ for temp_participant in participants:
             t1w_path, t2w_path = calc_synth_t1w_t2w(anats_dict['T1_images'][i], anats_dict['T2_images'][i], anats_dict['PD_images'][i], output_dir, temp_participant, temp_session)
 
             #Register synthetic t2w image to the MNI template
-            registered_t2w_name = os.path.join(out_anat_folder, t2w_path.split('/')[-1]).replace('T2w.nii.gz', 'reg-MNIInfant_T2w.nii.gz')
-            registered_t1_name = registered_t2w_name.replace('T2w.nii.gz', 'T1map.nii.gz')
-            registered_t2_name = registered_t2w_name.replace('T2w.nii.gz', 'T2map.nii.gz')
-            registered_pd_name = registered_t2w_name.replace('T2w.nii.gz', 'PDmap.nii.gz')
+            registered_t2w_name = os.path.join(out_anat_folder, t2w_path.split('/')[-1]).replace('T2w.nii.gz', 'reg-MNIInfant_T2w.nii')
+            registered_t1_name = registered_t2w_name.replace('T2w.nii', 'T1map.nii').replace('_space-QALAS', '')
+            registered_t2_name = registered_t2w_name.replace('T2w.nii', 'T2map.nii').replace('_space-QALAS', '')
+            registered_pd_name = registered_t2w_name.replace('T2w.nii', 'PDmap.nii').replace('_space-QALAS', '')
             generic_mask_path = register_images(t2w_path,
                                                 registered_t2w_name,
                                                 additional_images = {anats_dict['T1_images'][i] : registered_t1_name,
                                                                         anats_dict['T2_images'][i] : registered_t2_name,
                                                                         anats_dict['PD_images'][i] : registered_pd_name})
+            os.remove(registered_t2w_name) #dont actually need this
+            os.remove(registered_t2w_name.replace('_reg-MNIInfant', '')) #dont need this either
             for temp_reg in [registered_t1_name, registered_t2_name, registered_pd_name]:
                 
                 slice_img_path = temp_reg.replace('.nii', '_image-slice.png')
@@ -408,6 +429,9 @@ for temp_participant in participants:
                 else:
                     make_slices_image(temp_reg, slice_info_dict, slice_img_path, close_plot = True,
                             upsample_factor = 2)
+                    
+            for temp_uncompressed in [registered_t1_name, registered_t2_name, registered_pd_name, generic_mask_path]:
+                replace_file_with_gzipped_version(temp_uncompressed)
                 
             #Delete the synthetic image folder
             synthetic_image_folder = '/'.join(t1w_path.split('/')[:-1])
