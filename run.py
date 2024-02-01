@@ -304,6 +304,8 @@ parser.add_argument("analysis_level", help="Should always be participant", type=
 parser.add_argument('--participant_label', '--participant-label', help="The name/label of the subject to be processed (i.e. sub-01 or 01)", type=str)
 parser.add_argument('--session_id', '--session-id', help="OPTIONAL: the name of a specific session to be processed (i.e. ses-01)", type=str)
 parser.add_argument('--matplotlib_contrast', '--matplotlib-contrast', help="Use matplotlib to determine image contrast instead of brain mask intensity statistics.", action='store_true')
+parser.add_argument('--overwrite_existing', help='OPTIONAL: if flag is activated, the tool will delete the session folder where outputs are to be stored before processing if said folder already exists.', action='store_true')
+parser.add_argument('--skip_existing', help='OPTIONAL: if flag is activated, the tool will skip processing for a session if the session folder where outputs are to be stored already exists.', action='store_true')
 args = parser.parse_args()
 
 
@@ -380,6 +382,15 @@ for temp_participant in participants:
 
         #If there is no session structure, this will go to the subject path
         session_path = os.path.join(subject_path, temp_session)
+        if os.path.exists(session_path) and args.skip_existing:
+            print('Session folder already exists at the following path. Skipping: ' + session_path)
+            continue
+        elif os.path.exists(session_path) and args.overwrite_existing:
+            shutil.rmtree(session_path)
+            print('Removing existing session folder at: ' + session_path)
+        elif os.path.exists(session_path):
+            print('Session folder already exists at the following path. Either delete folder, run with --overwrite_existing flag to reprocess, or with --skip_existing to ignore existing folders: ' + session_path)
+            continue
         
         #Grab T2w file
         anats_dict = {'T2_images' : [],
