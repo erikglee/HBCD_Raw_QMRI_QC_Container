@@ -116,17 +116,19 @@ def register_images(input_file_path, output_file_path,
         contrast = 'T1w'
         stripped_out_file = os.path.join(output_file_path).replace('T1w.nii', 'masked-brain_T1w.nii')
         generic_out_mask = os.path.join(output_file_path).replace('T1w.nii', 'masked-brain.nii')
+        generic_out_mask_temp = os.path.join(output_file_path).replace('T1w.nii', 'masked-brain_nonreg.nii')
     elif 'T2w' in input_file_path:
         contrast = 'T2w'
         stripped_out_file = os.path.join(output_file_path).replace('T2w.nii', 'masked-brain_T2w.nii')
         generic_out_mask = os.path.join(output_file_path).replace('T2w.nii', 'masked-brain.nii')
+        generic_out_mask_temp = os.path.join(output_file_path).replace('T2w.nii', 'masked-brain_nonreg.nii')
         
     if os.path.exists(output_file_path):
         print('Using already existing registered out file with name: {}'.format(output_file_path))
         return generic_out_mask
     
     os.system('python3 /freesurfer/mri_synthstrip -i {input_path} -o {output_skull_stripped_path} -m {generic_out_mask}'.format(
-        input_path = input_file_path, output_skull_stripped_path = stripped_out_file, generic_out_mask=generic_out_mask))
+        input_path = input_file_path, output_skull_stripped_path = stripped_out_file, generic_out_mask=generic_out_mask_temp))
     
 
     ###NEED TO UPDATE THIS STUFF FOR ADDITIONAL T1/T2/PD maps to be saved
@@ -157,6 +159,18 @@ def register_images(input_file_path, output_file_path,
     resampled = affine_map.transform(original_image[0])
     dipy.io.image.save_nifti(output_file_path,
                      resampled, original_image[1])
+    
+    #This is now applying the registration to brain mask
+    original_image = dipy.io.image.load_nifti(generic_out_mask_temp)
+    affine_map = AffineMap(registered_img[1],
+                       original_image[0].shape, original_image[1],
+                       original_image[0].shape, original_image[1])
+    resampled = affine_map.transform(original_image[0])
+    dipy.io.image.save_nifti(generic_out_mask,
+                     resampled, original_image[1])
+    os.remove(generic_out_mask_temp)
+    
+    registered_out_path = generic_out_mask.replace('masked-brain_nonreg.nii', 'masked-brain.nii')
     
     #Iterate through all additional images defined by keys,
     #and apply registration, saving images to the locations
