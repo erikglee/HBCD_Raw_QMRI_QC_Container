@@ -428,9 +428,12 @@ for temp_participant in participants:
                                                 additional_images = {anats_dict['T1_images'][i] : registered_t1_name,
                                                                         anats_dict['T2_images'][i] : registered_t2_name,
                                                                         anats_dict['PD_images'][i] : registered_pd_name})
-            os.remove(registered_t2w_name) #dont actually need this
-            print('Removing {}'.format(registered_t2w_name))
-            os.remove(registered_t2w_name.replace('_reg-MNIInfant', '_reg-MNIInfant_masked-brain_reg-MNIInfant')) #dont need this either (ugly naming, I know!)
+            
+            remaining_t2w_files = glob.glob(os.path.join(out_anat_folder, '*T2w.ni*'))
+            print('{} T2w image types remaining'.format(len(remaining_t2w_files)))
+            for temp_t2w in remaining_t2w_files:
+                os.remove(temp_t2w)
+
             vmin_multipliers = [0.5, 0.5, 0.7]
             vmax_multipliers = [1.7, 1.7, 1.3]
             
