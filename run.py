@@ -418,10 +418,10 @@ for temp_participant in participants:
             #Copy over original symri json files
             shutil.copyfile(anats_dict['T1_images'][i].replace('.nii.gz', '.json'),
                             registered_t1_name.replace('.nii', '.json'))
-            shutil.copyfile(anats_dict['T1_images'][i].replace('.nii.gz', '.json'),
-                registered_t1_name.replace('.nii', '.json'))
-            shutil.copyfile(anats_dict['T1_images'][i].replace('.nii.gz', '.json'),
-                registered_t1_name.replace('.nii', '.json'))
+            shutil.copyfile(anats_dict['T2_images'][i].replace('.nii.gz', '.json'),
+                registered_t2_name.replace('.nii', '.json'))
+            shutil.copyfile(anats_dict['PD_images'][i].replace('.nii.gz', '.json'),
+                registered_pd_name.replace('.nii', '.json'))
 
             generic_mask_path = register_images(t2w_path,
                                                 registered_t2w_name,
