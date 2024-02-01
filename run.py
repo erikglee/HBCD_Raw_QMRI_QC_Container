@@ -115,12 +115,12 @@ def register_images(input_file_path, output_file_path,
     if 'T1w' in input_file_path:
         contrast = 'T1w'
         stripped_out_file = os.path.join(output_file_path).replace('T1w.nii', 'masked-brain_T1w.nii')
-        generic_out_mask = os.path.join(output_file_path).replace('T1w.nii', 'masked-brain.nii').replace('_space-QALAS', '')
+        generic_out_mask = os.path.join(output_file_path).replace('T1w.nii', 'masked-brain.nii').replace('_space-QALAS_desc-synthetic', '')
         generic_out_mask_temp = os.path.join(output_file_path).replace('T1w.nii', 'masked-brain_nonreg.nii')
     elif 'T2w' in input_file_path:
         contrast = 'T2w'
         stripped_out_file = os.path.join(output_file_path).replace('T2w.nii', 'masked-brain_T2w.nii')
-        generic_out_mask = os.path.join(output_file_path).replace('T2w.nii', 'masked-brain.nii').replace('_space-QALAS', '')
+        generic_out_mask = os.path.join(output_file_path).replace('T2w.nii', 'masked-brain.nii').replace('_space-QALAS_desc-synthetic', '')
         generic_out_mask_temp = os.path.join(output_file_path).replace('T2w.nii', 'masked-brain_nonreg.nii')
         
     if os.path.exists(output_file_path):
