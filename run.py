@@ -368,7 +368,7 @@ for temp_participant in participants:
 
         for temp_t2 in t2_anats:
             t1 = temp_t2.replace('T2map.nii', 'T1map.nii')
-            pd = temp_t2.replace('T2map.nii', 'T1map.nii')
+            pd = temp_t2.replace('T2map.nii', 'PDmap.nii')
             if os.path.exists(t1) and os.path.exists(pd):
                 anats_dict['T2_images'].append(temp_t2)
                 anats_dict['T1_images'].append(t1)
@@ -390,9 +390,9 @@ for temp_participant in participants:
 
             #Register synthetic t2w image to the MNI template
             registered_t2w_name = os.path.join(out_anat_folder, t2w_path.split('/')[-1]).replace('T2w.nii.gz', 'reg-MNIInfant_T1w.nii.gz')
-            registered_t1_name = os.path.join(out_anat_folder, anats_dict['T1_images'][i].split('/')[-1]).replace('T1map.nii.gz', 'reg-MNIInfant_T1map.nii.gz')
-            registered_t2_name = os.path.join(out_anat_folder, anats_dict['T2_images'][i].split('/')[-1]).replace('T2map.nii.gz', 'reg-MNIInfant_T2map.nii.gz')
-            registered_pd_name = os.path.join(out_anat_folder, anats_dict['PD_images'][i].split('/')[-1]).replace('PDmap.nii.gz', 'reg-MNIInfant_PDmap.nii.gz')
+            registered_t1_name = registered_t2w_name.replace('T2w.nii.gz', 'T1map.nii.gz')
+            registered_t2_name = registered_t2w_name.replace('T2w.nii.gz', 'T2map.nii.gz')
+            registered_pd_name = registered_t2w_name.replace('T2w.nii.gz', 'PDmap.nii.gz')
             generic_mask_path = register_images(t2w_path,
                                                 registered_t2w_name,
                                                 additional_images = {anats_dict['T1_images'][i] : registered_t1_name,
