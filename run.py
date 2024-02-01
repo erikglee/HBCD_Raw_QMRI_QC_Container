@@ -414,12 +414,22 @@ for temp_participant in participants:
             registered_t1_name = registered_t2w_name.replace('T2w.nii', 'T1map.nii').replace('_space-QALAS', '')
             registered_t2_name = registered_t2w_name.replace('T2w.nii', 'T2map.nii').replace('_space-QALAS', '')
             registered_pd_name = registered_t2w_name.replace('T2w.nii', 'PDmap.nii').replace('_space-QALAS', '')
+
+            #Copy over original symri json files
+            shutil.copyfile(anats_dict['T1_images'][i].replace('.nii.gz', '.json'),
+                            registered_t1_name.replace('.nii', '.json'))
+            shutil.copyfile(anats_dict['T1_images'][i].replace('.nii.gz', '.json'),
+                registered_t1_name.replace('.nii', '.json'))
+            shutil.copyfile(anats_dict['T1_images'][i].replace('.nii.gz', '.json'),
+                registered_t1_name.replace('.nii', '.json'))
+
             generic_mask_path = register_images(t2w_path,
                                                 registered_t2w_name,
                                                 additional_images = {anats_dict['T1_images'][i] : registered_t1_name,
                                                                         anats_dict['T2_images'][i] : registered_t2_name,
                                                                         anats_dict['PD_images'][i] : registered_pd_name})
             os.remove(registered_t2w_name) #dont actually need this
+            print('Removing {}'.format(registered_t2w_name))
             os.remove(registered_t2w_name.replace('_reg-MNIInfant', '_reg-MNIInfant_masked-brain')) #dont need this either
             vmin_multipliers = [0.5, 0.3, 0.5]
             vmax_multipliers = [1.5, 1.7, 1.5]
