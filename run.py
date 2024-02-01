@@ -395,22 +395,28 @@ for temp_participant in participants:
     for temp_session in sessions:
 
         #If there is no session structure, this will go to the subject path
-        session_path = os.path.join(subject_path, temp_session)
-        if os.path.exists(session_path) and args.skip_existing:
-            print('Session folder already exists at the following path. Skipping: ' + session_path)
+        session_input_path = os.path.join(subject_path, temp_session)
+        session_output_path = os.path.join(output_dir, temp_participant, temp_session)
+        if os.path.exists(session_output_path) and args.skip_existing:
+            print('Session folder already exists at the following path. Skipping: ' + session_output_path)
             continue
-        elif os.path.exists(session_path) and args.overwrite_existing:
-            shutil.rmtree(session_path)
-            print('Removing existing session folder at: ' + session_path)
-        elif os.path.exists(session_path):
-            print('Session folder already exists at the following path. Either delete folder, run with --overwrite_existing flag to reprocess, or with --skip_existing to ignore existing folders: ' + session_path)
+        elif os.path.exists(session_output_path) and args.overwrite_existing:
+            shutil.rmtree(session_output_path)
+            print('Removing existing session folder at: ' + session_output_path)
+        elif os.path.exists(session_output_path):
+            print('Session folder already exists at the following path. Either delete folder, run with --overwrite_existing flag to reprocess, or with --skip_existing to ignore existing folders: ' + session_output_path)
             continue
+
+        #Make output anat folder for subject/session if it doesnt exist
+        out_anat_folder = os.path.join(output_dir, temp_participant, temp_session, 'anat')
+        if os.path.exists(out_anat_folder) == False:
+            os.makedirs(out_anat_folder)
         
         #Grab T2w file
         anats_dict = {'T2_images' : [],
                       'T1_images' : [],
                       'PD_images' : []}
-        t2_anats = glob.glob(os.path.join(session_path,'anat/*T2map.ni*'))
+        t2_anats = glob.glob(os.path.join(session_input_path,'anat/*T2map.ni*'))
 
         for temp_t2 in t2_anats:
             t1 = temp_t2.replace('T2map.nii', 'T1map.nii')
@@ -425,11 +431,6 @@ for temp_participant in participants:
 
             
         for i, temp_t2 in enumerate(anats_dict['T2_images']):
-
-            #Make output anat folder for subject/session if it doesnt exist
-            out_anat_folder = os.path.join(output_dir, temp_participant, temp_session, 'anat')
-            if os.path.exists(out_anat_folder) == False:
-                os.makedirs(out_anat_folder)
 
             #First create a synthetic T2w image for registration
             t1w_path, t2w_path = calc_synth_t1w_t2w(anats_dict['T1_images'][i], anats_dict['T2_images'][i], anats_dict['PD_images'][i], output_dir, temp_participant, temp_session)
@@ -487,4 +488,4 @@ for temp_participant in participants:
             shutil.rmtree(synthetic_image_folder)
 
 
-        print('Finished with: {}'.format(session_path))
+        print('Finished with: {}'.format(session_input_path))
