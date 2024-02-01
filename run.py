@@ -418,7 +418,7 @@ for temp_participant in participants:
                                                                         anats_dict['T2_images'][i] : registered_t2_name,
                                                                         anats_dict['PD_images'][i] : registered_pd_name})
             os.remove(registered_t2w_name) #dont actually need this
-            os.remove(registered_t2w_name.replace('_reg-MNIInfant', '')) #dont need this either
+            os.remove(registered_t2w_name.replace('_reg-MNIInfant', '_reg-MNIInfant_masked-brain')) #dont need this either
             for temp_reg in [registered_t1_name, registered_t2_name, registered_pd_name]:
                 
                 slice_img_path = temp_reg.replace('.nii', '_image-slice.png')
