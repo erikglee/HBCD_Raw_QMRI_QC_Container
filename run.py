@@ -434,8 +434,8 @@ for temp_participant in participants:
             for temp_t2w in remaining_t2w_files:
                 os.remove(temp_t2w)
 
-            vmin_multipliers = [0.5, 0.5, 0.7]
-            vmax_multipliers = [1.7, 1.7, 1.3]
+            vmin_multipliers = [0.3, 0.3, 0.75]
+            vmax_multipliers = [1.5, 1.5, 1.25]
             
             for j, temp_reg in enumerate([registered_t1_name, registered_t2_name, registered_pd_name]):
                 
