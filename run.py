@@ -389,7 +389,7 @@ for temp_participant in participants:
             t1w_path, t2w_path = calc_synth_t1w_t2w(anats_dict['T1_images'][i], anats_dict['T2_images'][i], anats_dict['PD_images'][i], output_dir, temp_participant, temp_session)
 
             #Register synthetic t2w image to the MNI template
-            registered_t2w_name = os.path.join(out_anat_folder, t2w_path.split('/')[-1]).replace('T2w.nii.gz', 'reg-MNIInfant_T1w.nii.gz')
+            registered_t2w_name = os.path.join(out_anat_folder, t2w_path.split('/')[-1]).replace('T2w.nii.gz', 'reg-MNIInfant_T2w.nii.gz')
             registered_t1_name = registered_t2w_name.replace('T2w.nii.gz', 'T1map.nii.gz')
             registered_t2_name = registered_t2w_name.replace('T2w.nii.gz', 'T2map.nii.gz')
             registered_pd_name = registered_t2w_name.replace('T2w.nii.gz', 'PDmap.nii.gz')
