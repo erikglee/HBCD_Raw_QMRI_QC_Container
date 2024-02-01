@@ -416,12 +416,15 @@ for temp_participant in participants:
             registered_pd_name = registered_t2w_name.replace('T2w.nii', 'PDmap.nii').replace('_space-QALAS', '')
 
             #Copy over original symri json files
-            shutil.copyfile(anats_dict['T1_images'][i].replace('.nii.gz', '.json'),
-                            registered_t1_name.replace('.nii', '.json'))
-            shutil.copyfile(anats_dict['T2_images'][i].replace('.nii.gz', '.json'),
-                registered_t2_name.replace('.nii', '.json'))
-            shutil.copyfile(anats_dict['PD_images'][i].replace('.nii.gz', '.json'),
-                registered_pd_name.replace('.nii', '.json'))
+            try:
+                shutil.copyfile(anats_dict['T1_images'][i].replace('.nii.gz', '.json'),
+                                registered_t1_name.replace('.nii', '.json'))
+                shutil.copyfile(anats_dict['T2_images'][i].replace('.nii.gz', '.json'),
+                    registered_t2_name.replace('.nii', '.json'))
+                shutil.copyfile(anats_dict['PD_images'][i].replace('.nii.gz', '.json'),
+                    registered_pd_name.replace('.nii', '.json'))
+            except:
+                print('Issue copying input json files. Continuing on with processing.')
 
             generic_mask_path = register_images(t2w_path,
                                                 registered_t2w_name,
@@ -430,13 +433,13 @@ for temp_participant in participants:
                                                                         anats_dict['PD_images'][i] : registered_pd_name})
             
             remaining_t2w_files = glob.glob(os.path.join(out_anat_folder, '*T2w.ni*'))
-            print('{} T2w image types remaining'.format(len(remaining_t2w_files)))
             for temp_t2w in remaining_t2w_files:
                 os.remove(temp_t2w)
 
             vmin_multipliers = [0.7, 0.7, 0.75]
             vmax_multipliers = [1.8, 1.8, 1.25]
             
+            print('Making image slices.')
             for j, temp_reg in enumerate([registered_t1_name, registered_t2_name, registered_pd_name]):
                 
                 slice_img_path = temp_reg.replace('.nii', '_image-slice.png')
@@ -448,11 +451,13 @@ for temp_participant in participants:
                 else:
                     make_slices_image(temp_reg, slice_info_dict, slice_img_path, close_plot = True,
                             upsample_factor = 2)
-                    
+
+            print('Compressing nifti files.')
             for temp_uncompressed in [registered_t1_name, registered_t2_name, registered_pd_name, generic_mask_path]:
                 replace_file_with_gzipped_version(temp_uncompressed)
                 
             #Delete the synthetic image folder
+            print('Removing synthetic T1w/T2w folder.')
             synthetic_image_folder = '/'.join(t1w_path.split('/')[:-1])
             shutil.rmtree(synthetic_image_folder)
 
