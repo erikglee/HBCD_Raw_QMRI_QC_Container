@@ -430,9 +430,9 @@ for temp_participant in participants:
                                                                         anats_dict['PD_images'][i] : registered_pd_name})
             os.remove(registered_t2w_name) #dont actually need this
             print('Removing {}'.format(registered_t2w_name))
-            os.remove(registered_t2w_name.replace('_reg-MNIInfant', '_reg-MNIInfant_masked-brain')) #dont need this either
-            vmin_multipliers = [0.5, 0.3, 0.5]
-            vmax_multipliers = [1.5, 1.7, 1.5]
+            os.remove(registered_t2w_name.replace('_reg-MNIInfant', '_reg-MNIInfant_masked-brain_reg-MNIInfant')) #dont need this either (ugly naming, I know!)
+            vmin_multipliers = [0.5, 0.5, 0.7]
+            vmax_multipliers = [1.7, 1.7, 1.3]
             
             for j, temp_reg in enumerate([registered_t1_name, registered_t2_name, registered_pd_name]):
                 
