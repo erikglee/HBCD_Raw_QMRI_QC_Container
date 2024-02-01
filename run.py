@@ -176,7 +176,8 @@ def register_images(input_file_path, output_file_path,
     return generic_out_mask
 
 def make_slices_image(image_nifti_path, slice_info_dict, output_img_name, close_plot = True,
-                     upsample_factor = 2, mask_path = None):
+                     upsample_factor = 2, mask_path = None, vmin_multiplier = 0.3,
+                     vmax_multiplier = 1.7):
     '''Takes a nifti and plots slices of the nifti according to slices_info_dict
     
     Parameters
@@ -195,6 +196,7 @@ def make_slices_image(image_nifti_path, slice_info_dict, output_img_name, close_
     mask_path : str or None, default None
         A binary brain mask.
         This will can be used to help with image contrast.
+    vmin_multiplier : float, default 
         
     Example slice_info_dict. The first entry in each key's
     list dictates which plane is being imaged. The second
@@ -235,8 +237,8 @@ def make_slices_image(image_nifti_path, slice_info_dict, output_img_name, close_
         #vmax = np.percentile(mask_vals, 95)
         hist_results = np.histogram(mask_vals, bins = 100)
         modal_value = hist_results[1][np.argmax(hist_results[0])]
-        vmin = modal_value*.3
-        vmax = modal_value*1.7
+        vmin = modal_value*vmin_multiplier
+        vmax = modal_value*vmax_multiplier
     
     
     #Setup interpolator in scipy so we can
@@ -419,13 +421,17 @@ for temp_participant in participants:
                                                                         anats_dict['PD_images'][i] : registered_pd_name})
             os.remove(registered_t2w_name) #dont actually need this
             os.remove(registered_t2w_name.replace('_reg-MNIInfant', '_reg-MNIInfant_masked-brain')) #dont need this either
-            for temp_reg in [registered_t1_name, registered_t2_name, registered_pd_name]:
+            vmin_multipliers = [0.5, 0.3, 0.5]
+            vmax_multipliers = [1.5, 1.7, 1.5]
+            
+            for j, temp_reg in enumerate([registered_t1_name, registered_t2_name, registered_pd_name]):
                 
                 slice_img_path = temp_reg.replace('.nii', '_image-slice.png')
                 slice_img_path = slice_img_path.replace('slice.png.gz', 'slice.png') #For case when nifti is compressed
                 if matplotlib_contrast == False:
                     make_slices_image(temp_reg, slice_info_dict, slice_img_path, close_plot = True,
-                            upsample_factor = 2, mask_path = generic_mask_path)
+                            upsample_factor = 2, mask_path = generic_mask_path,
+                            vmin_multiplier=vmin_multipliers[j], vmax_multiplier=vmax_multipliers[j])
                 else:
                     make_slices_image(temp_reg, slice_info_dict, slice_img_path, close_plot = True,
                             upsample_factor = 2)
@@ -436,5 +442,6 @@ for temp_participant in participants:
             #Delete the synthetic image folder
             synthetic_image_folder = '/'.join(t1w_path.split('/')[:-1])
             shutil.rmtree(synthetic_image_folder)
+
 
         print('Finished with: {}'.format(session_path))
