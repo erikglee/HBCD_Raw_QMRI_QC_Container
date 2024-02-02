@@ -437,9 +437,9 @@ for temp_participant in participants:
 
             #Register synthetic t2w image to the MNI template
             registered_t2w_name = os.path.join(out_anat_folder, t2w_path.split('/')[-1]).replace('T2w.nii.gz', 'reg-MNIInfant_T2w.nii')
-            registered_t1_name = registered_t2w_name.replace('T2w.nii', 'T1map.nii').replace('_space-QALAS', '').replace('_desc-synthetic', '')
-            registered_t2_name = registered_t2w_name.replace('T2w.nii', 'T2map.nii').replace('_space-QALAS', '').replace('_desc-synthetic', '')
-            registered_pd_name = registered_t2w_name.replace('T2w.nii', 'PDmap.nii').replace('_space-QALAS', '').replace('_desc-synthetic', '')
+            registered_t1_name = registered_t2w_name.replace('T2w.nii', 'T1map.nii').replace('_space-QALAS', '').replace('_desc-synthetic', '_acq-QALAS')
+            registered_t2_name = registered_t2w_name.replace('T2w.nii', 'T2map.nii').replace('_space-QALAS', '').replace('_desc-synthetic', '_acq-QALAS')
+            registered_pd_name = registered_t2w_name.replace('T2w.nii', 'PDmap.nii').replace('_space-QALAS', '').replace('_desc-synthetic', '_acq-QALAS')
 
             #Copy over original symri json files
             try:
