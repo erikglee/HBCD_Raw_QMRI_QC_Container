@@ -463,7 +463,7 @@ for temp_participant in participants:
                 os.remove(temp_t2w)
 
             vmin_multipliers = [0.7, 0.7, 0.75]
-            vmax_multipliers = [1.8, 1.8, 1.25]
+            vmax_multipliers = [1.5, 1.5, 1.25]
             
             print('Making image slices.')
             for j, temp_reg in enumerate([registered_t1_name, registered_t2_name, registered_pd_name]):
