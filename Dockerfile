@@ -17,7 +17,7 @@ ADD image_templates/tpl-MNIInfant_cohort-1_res-1_mask-applied_T2w.nii.gz /image_
 ADD run.py /hbcd_code/run.py
 RUN chmod 555 -R /hbcd_code
 ENV PATH="${PATH}:/hbcd_code"
-RUN pipeline_name=hbcd_qc && cp /hbcd_code/run.py /hbcd_code/$pipeline_name
+RUN pipeline_name=hbcd_qmri_qc && cp /hbcd_code/run.py /hbcd_code/$pipeline_name
 
 #Define entrypoint
-ENTRYPOINT ["hbcd_qc"]
+ENTRYPOINT ["hbcd_qmri_qc"]
